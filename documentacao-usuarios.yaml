@@ -1,0 +1,98 @@
+openapi: 3.1.0
+info:
+  title: API de Usuários
+  version: 1.0.0
+  description: Endpoints para gestão de usuários.
+servers:
+  - url: https://api.exemplo.com
+paths:
+  /usuario:
+    post:
+      summary: Criar usuário
+      description: Cria um novo usuário a partir de nome e e-mail.
+      tags: [Usuários]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioCreate'
+            examples:
+              exemploValido:
+                value:
+                  nome: "Maria Silva"
+                  email: "maria.silva@example.com"
+      responses:
+        '201':
+          description: Criado
+          headers:
+            Location:
+              description: URL do recurso criado
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+              examples:
+                criado:
+                  value:
+                    id: "b2f6b8e9-6c0a-4c9c-9d8f-1a2b3c4d5e6f"
+                    nome: "Maria Silva"
+                    email: "maria.silva@example.com"
+                    criadoEm: "2025-08-19T12:34:56Z"
+        '400':
+          description: Requisição inválida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+              examples:
+                emailInvalido:
+                  value:
+                    codigo: "EMAIL_INVALIDO"
+                    mensagem: "O campo 'email' não é válido."
+components:
+  schemas:
+    UsuarioCreate:
+      type: object
+      required: [nome, email]
+      properties:
+        nome:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Nome completo do usuário.
+        email:
+          type: string
+          format: email
+          description: E-mail do usuário.
+      additionalProperties: false
+    Usuario:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        nome:
+          type: string
+        email:
+          type: string
+          format: email
+        criadoEm:
+          type: string
+          format: date-time
+      required: [id, nome, email, criadoEm]
+      additionalProperties: false
+    Erro:
+      type: object
+      properties:
+        codigo:
+          type: string
+          description: Código de erro para identificação.
+        mensagem:
+          type: string
+          description: Mensagem amigável descrevendo o problema.
+      required: [codigo, mensagem]
+      additionalProperties: false
